@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -9,330 +10,58 @@
     <title>Lifestyle Score Tracker</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
-        
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        
-        .save-status {
-            background: rgba(16, 185, 129, 0.3);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            margin: 10px auto;
-            max-width: 400px;
-            text-align: center;
-            font-size: 0.9rem;
-        }
-        
-        .scores {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .score-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
-        .score-card.today {
-            transition: all 0.3s;
-        }
-        
-        .score-card.today.negative {
-            background: #ef4444;
-            color: white;
-        }
-        
-        .score-card.today.neutral {
-            background: #f97316;
-            color: white;
-        }
-        
-        .score-card.today.positive {
-            background: #10b981;
-            color: white;
-        }
-        
-        .score-card.total {
-            background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-            color: white;
-        }
-        
-        .score-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            margin-bottom: 10px;
-        }
-        
-        .score-value {
-            font-size: 3rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .score-motivation {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-top: 10px;
-        }
-        
-        .motivation-box {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            color: white;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
-        .motivation-box h3 {
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-        }
-        
-        .motivation-box p {
-            line-height: 1.6;
-            margin-bottom: 15px;
-        }
-        
-        .tip-box {
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
-            padding: 15px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .milestones {
-            margin-bottom: 30px;
-        }
-        
-        .milestone {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .milestone-icon {
-            font-size: 2rem;
-        }
-        
-        .activities {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
-        .activities h2 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            color: #374151;
-        }
-        
-        .activity {
-            border: 2px solid #e5e7eb;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: all 0.3s;
-        }
-        
-        .activity:hover {
-            border-color: #8b5cf6;
-        }
-        
-        .activity-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .activity-name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #374151;
-        }
-        
-        .activity-points {
-            padding: 5px 12px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        
-        .points-positive {
-            background: #d1fae5;
-            color: #065f46;
-        }
-        
-        .points-negative {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        
-        .points-neutral {
-            background: #f3f4f6;
-            color: #6b7280;
-        }
-        
-        .activity-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr auto;
-            gap: 10px;
-        }
-        
-        .btn {
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .btn:active {
-            transform: scale(0.95);
-        }
-        
-        .btn-yes {
-            background: #f3f4f6;
-            color: #6b7280;
-        }
-        
-        .btn-yes.active {
-            background: #10b981;
-            color: white;
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
-        }
-        
-        .btn-no {
-            background: #f3f4f6;
-            color: #6b7280;
-        }
-        
-        .btn-no.active {
-            background: #ef4444;
-            color: white;
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
-        }
-        
-        .btn-reset {
-            background: #e5e7eb;
-            color: #6b7280;
-            padding: 15px 20px;
-        }
-        
-        .btn-reset:hover {
-            background: #d1d5db;
-        }
-        
-        .chart-container {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
-        .chart-container h2 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            color: #374151;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-bottom: 30px;
-        }
-        
-        .action-btn {
-            padding: 15px 30px;
-            background: white;
-            color: #8b5cf6;
-            border: 2px solid #8b5cf6;
-            border-radius: 15px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        .action-btn:hover {
-            background: #8b5cf6;
-            color: white;
-        }
-        
-        .reset-btn {
-            display: block;
-            margin: 0 auto;
-            padding: 15px 40px;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 15px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3);
-        }
-        
-        .reset-btn:hover {
-            background: #dc2626;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { text-align: center; color: white; margin-bottom: 30px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
+        .save-status { background: rgba(16, 185, 129, 0.3); color: white; padding: 10px 20px; border-radius: 10px; margin: 10px auto; max-width: 400px; text-align: center; font-size: 0.9rem; }
+        .scores { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+        .score-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.3s; }
+        .score-card.today.negative { background: #ef4444; color: white; }
+        .score-card.today.neutral { background: #f97316; color: white; }
+        .score-card.today.positive { background: #10b981; color: white; }
+        .score-card.total { background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%); color: white; }
+        .score-label { font-size: 0.9rem; opacity: 0.9; margin-bottom: 10px; }
+        .score-value { font-size: 3rem; font-weight: bold; margin-bottom: 5px; }
+        .score-motivation { font-size: 1.1rem; font-weight: 600; margin-top: 10px; }
+        .motivation-box { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; border-radius: 20px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .motivation-box h3 { font-size: 1.5rem; margin-bottom: 15px; }
+        .motivation-box p { line-height: 1.6; margin-bottom: 15px; }
+        .tip-box { background: rgba(255,255,255,0.2); border-radius: 10px; padding: 15px; }
+        .milestones { margin-bottom: 30px; }
+        .milestone { background: white; border-radius: 15px; padding: 20px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 15px; }
+        .milestone-icon { font-size: 2rem; }
+        .activities { background: white; border-radius: 20px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .activities h2 { font-size: 1.8rem; margin-bottom: 20px; color: #374151; }
+        .activity { border: 2px solid #e5e7eb; border-radius: 15px; padding: 20px; margin-bottom: 20px; transition: all 0.3s; }
+        .activity:hover { border-color: #8b5cf6; }
+        .activity-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .activity-name { font-size: 1.1rem; font-weight: 600; color: #374151; }
+        .activity-points { padding: 5px 12px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; }
+        .points-positive { background: #d1fae5; color: #065f46; }
+        .points-negative { background: #fee2e2; color: #991b1b; }
+        .points-neutral { background: #f3f4f6; color: #6b7280; }
+        .activity-buttons { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; }
+        .btn { padding: 15px; border: none; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn:active { transform: scale(0.95); }
+        .btn-yes { background: #f3f4f6; color: #6b7280; }
+        .btn-yes.active { background: #10b981; color: white; transform: scale(1.05); box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4); }
+        .btn-no { background: #f3f4f6; color: #6b7280; }
+        .btn-no.active { background: #ef4444; color: white; transform: scale(1.05); box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4); }
+        .btn-reset { background: #e5e7eb; color: #6b7280; padding: 15px 20px; }
+        .btn-reset:hover { background: #d1d5db; }
+        .chart-container { background: white; border-radius: 20px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .chart-container h2 { font-size: 1.8rem; margin-bottom: 20px; color: #374151; }
+        .action-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px; }
+        .action-btn { padding: 15px 30px; background: white; color: #8b5cf6; border: 2px solid #8b5cf6; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; }
+        .action-btn:hover { background: #8b5cf6; color: white; }
+        .reset-btn { display: block; margin: 0 auto; padding: 15px 40px; background: #ef4444; color: white; border: none; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3); }
+        .reset-btn:hover { background: #dc2626; }
         @media (max-width: 768px) {
-            .scores {
-                grid-template-columns: 1fr;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .score-value {
-                font-size: 2.5rem;
-            }
+            .scores { grid-template-columns: 1fr; }
+            .header h1 { font-size: 2rem; }
+            .score-value { font-size: 2.5rem; }
         }
     </style>
 </head>
@@ -343,16 +72,11 @@
             <p>Bouw aan een beter leven, één dag tegelijk</p>
             <p id="dateTime" style="margin-top: 10px; font-size: 1.1rem; opacity: 0.9;"></p>
         </div>
-        
-        <div class="save-status">
-            ✅ Je data wordt automatisch opgeslagen in je browser!
-        </div>
-        
+        <div class="save-status">✅ Je data wordt automatisch opgeslagen!</div>
         <div class="action-buttons">
             <button class="action-btn" onclick="exportData()">💾 Exporteer Backup</button>
             <button class="action-btn" onclick="importData()">📂 Importeer Backup</button>
         </div>
-        
         <div class="scores">
             <div class="score-card today" id="todayCard">
                 <div class="score-label">📅 Vandaag</div>
@@ -365,27 +89,20 @@
                 <div class="score-value" id="totalScore">0</div>
             </div>
         </div>
-        
         <div class="motivation-box" id="motivationBox"></div>
-        
         <div class="milestones" id="milestones"></div>
-        
         <div class="activities">
             <h2>📊 Dagelijkse Activiteiten</h2>
             <div id="activitiesList"></div>
         </div>
-        
         <div class="chart-container">
             <h2>📈 Voortgang</h2>
             <canvas id="progressChart"></canvas>
         </div>
-        
         <button class="reset-btn" onclick="resetAll()">Reset Alle Data</button>
     </div>
-
     <script>
-        const STORAGE_KEY = 'lifestyle_tracker_data_v3';
-        
+        const STORAGE_KEY = 'lifestyle_tracker_v3';
         const categories = [
             { key: 'goodSleep', label: 'Goede Nachtrust', points: 1 },
             { key: 'sport', label: 'Sporten', points: 1 },
@@ -395,208 +112,90 @@
             { key: 'noDrink', label: 'Geen Drank', pointsYes: 0, pointsNo: -2 },
             { key: 'noDrugs', label: 'Geen Drugs', pointsYes: 0, pointsNo: -2 }
         ];
-
-        let state = {
-            days: {},
-            baseTotalScore: 0,
-            lastDate: null
-        };
-        
-        let activities = {};
-        let todayScore = -2;
-        let totalScore = 0;
-        let chart = null;
-
+        let state = { days: {}, baseTotalScore: 0, lastDate: null };
+        let activities = {}, todayScore = -2, totalScore = 0, chart = null;
         const motivations = [
-            {
-                title: "💪 Focus op Beweging",
-                text: "Regelmatig sporten verbetert niet alleen je fysieke gezondheid, maar ook je mentale welzijn. Probeer elke dag minstens 30 minuten te bewegen.",
-                tip: "Start klein: 10 push-ups elke ochtend kan al een grote impact hebben!"
-            },
-            {
-                title: "🥗 Voeding is de Basis",
-                text: "Je lichaam is een tempel en voeding is de bouwsteen. Eet kleurrijk: hoe meer verschillende kleuren groenten en fruit op je bord, hoe beter.",
-                tip: "Bereid je maaltijden voor op zondag, zo voorkom je ongezonde keuzes tijdens de week."
-            },
-            {
-                title: "🧘 Mindfulness Moment",
-                text: "Meditatie hoeft niet ingewikkeld te zijn. Zelfs 5 minuten per dag bewust ademhalen kan stress verminderen en je focus verbeteren.",
-                tip: "Probeer de '4-7-8' ademhalingstechniek: 4 tellen inademen, 7 vasthouden, 8 uitademen."
-            },
-            {
-                title: "😴 Slaap is Superkracht",
-                text: "Goede slaap is essentieel voor herstel, geheugen en emotionele balans. Probeer een vast slaapritme aan te houden, zelfs in het weekend.",
-                tip: "Zet je telefoon een uur voor bedtijd weg en dim het licht. Maak een rustgevend avondritueel."
-            },
-            {
-                title: "📚 Blijf Groeien",
-                text: "Persoonlijke ontwikkeling is een levenslange reis. Of je nu een boek leest, een cursus volgt of een nieuwe vaardigheid leert - elke dag leren is elke dag groeien.",
-                tip: "Lees 10 pagina's per dag. Dat zijn 3.650 pagina's per jaar - ongeveer 12 boeken!"
-            },
-            {
-                title: "🚫 Alcohol & Bewustzijn",
-                text: "Geen alcohol drinken geeft je helderheid, betere slaap en meer energie. Bewuste keuzes maken over wanneer en hoeveel je drinkt is krachtig.",
-                tip: "Zoek alternatieven: probeer alcoholvrije cocktails of sparkling water met fruit."
-            },
-            {
-                title: "🎯 Consistentie Wint",
-                text: "Rome is niet in één dag gebouwd. De kleine, dagelijkse keuzes die je maakt stapelen zich op tot grote veranderingen.",
-                tip: "Focus op progress, niet perfectie. Een 'slechte' dag maakt je niet tot een slecht persoon."
-            }
+            { title: "💪 Focus op Beweging", text: "Regelmatig sporten verbetert niet alleen je fysieke gezondheid, maar ook je mentale welzijn. Probeer elke dag minstens 30 minuten te bewegen.", tip: "Start klein: 10 push-ups elke ochtend kan al een grote impact hebben!" },
+            { title: "🥗 Voeding is de Basis", text: "Je lichaam is een tempel en voeding is de bouwsteen. Eet kleurrijk: hoe meer verschillende kleuren groenten en fruit op je bord, hoe beter.", tip: "Bereid je maaltijden voor op zondag, zo voorkom je ongezonde keuzes tijdens de week." },
+            { title: "🧘 Mindfulness Moment", text: "Meditatie hoeft niet ingewikkeld te zijn. Zelfs 5 minuten per dag bewust ademhalen kan stress verminderen en je focus verbeteren.", tip: "Probeer de '4-7-8' ademhalingstechniek: 4 tellen inademen, 7 vasthouden, 8 uitademen." },
+            { title: "😴 Slaap is Superkracht", text: "Goede slaap is essentieel voor herstel, geheugen en emotionele balans. Probeer een vast slaapritme aan te houden, zelfs in het weekend.", tip: "Zet je telefoon een uur voor bedtijd weg en dim het licht. Maak een rustgevend avondritueel." },
+            { title: "📚 Blijf Groeien", text: "Persoonlijke ontwikkeling is een levenslange reis. Of je nu een boek leest, een cursus volgt of een nieuwe vaardigheid leert - elke dag leren is elke dag groeien.", tip: "Lees 10 pagina's per dag. Dat zijn 3.650 pagina's per jaar - ongeveer 12 boeken!" },
+            { title: "🚫 Alcohol & Bewustzijn", text: "Geen alcohol drinken geeft je helderheid, betere slaap en meer energie. Bewuste keuzes maken over wanneer en hoeveel je drinkt is krachtig.", tip: "Zoek alternatieven: probeer alcoholvrije cocktails of sparkling water met fruit." },
+            { title: "🎯 Consistentie Wint", text: "Rome is niet in één dag gebouwd. De kleine, dagelijkse keuzes die je maakt stapelen zich op tot grote veranderingen.", tip: "Focus op progress, niet perfectie. Een 'slechte' dag maakt je niet tot een slecht persoon." }
         ];
 
-        function getTodayKey() {
-            const today = new Date();
-            return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-        }
-
-        function saveToStorage() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-                return true;
-            } catch (e) {
-                console.error('Kon niet opslaan:', e);
-                return false;
-            }
-        }
-
-        function loadFromStorage() {
-            try {
-                const data = localStorage.getItem(STORAGE_KEY);
-                if (data) {
-                    return JSON.parse(data);
-                }
-            } catch (e) {
-                console.log('Kon niet laden:', e);
-            }
-            return null;
-        }
-
+        function getTodayKey() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+        function saveToStorage() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); return true; } catch(e) { return false; } }
+        function loadFromStorage() { try { const d = localStorage.getItem(STORAGE_KEY); return d ? JSON.parse(d) : null; } catch(e) { return null; } }
+        
         function exportData() {
-            const dataStr = JSON.stringify(state, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
+            const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = `lifestyle-backup-${getTodayKey()}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            alert('💾 Backup gedownload!');
+            a.href = url; a.download = `lifestyle-backup-${getTodayKey()}.json`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            URL.revokeObjectURL(url); alert('💾 Backup gedownload!');
         }
-
+        
         function importData() {
             const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = '.json';
+            input.type = 'file'; input.accept = '.json';
             input.onchange = e => {
-                const file = e.target.files[0];
                 const reader = new FileReader();
-                reader.onload = event => {
-                    try {
-                        const importedState = JSON.parse(event.target.result);
-                        state = importedState;
-                        saveToStorage();
-                        initializeApp();
-                        alert('📂 Data geïmporteerd!');
-                    } catch (err) {
-                        alert('❌ Fout bij importeren');
-                    }
+                reader.onload = ev => {
+                    try { state = JSON.parse(ev.target.result); saveToStorage(); initializeApp(); alert('📂 Data geïmporteerd!'); }
+                    catch(err) { alert('❌ Fout bij importeren'); }
                 };
-                reader.readAsText(file);
+                reader.readAsText(e.target.files[0]);
             };
             input.click();
         }
 
         function initializeApp() {
-            const savedState = loadFromStorage();
-            
-            if (savedState) {
-                state = savedState;
-            } else {
-                state = {
-                    days: {},
-                    baseTotalScore: 0,
-                    lastDate: null
-                };
-            }
+            const saved = loadFromStorage();
+            if (saved) state = saved;
+            else state = { days: {}, baseTotalScore: 0, lastDate: null };
 
-            const todayKey = getTodayKey();
-            const lastDate = state.lastDate;
-
-            if (lastDate && lastDate !== todayKey) {
-                const yesterdayData = state.days[lastDate];
-                if (yesterdayData) {
-                    state.baseTotalScore += yesterdayData.score;
-                }
-                
-                categories.forEach(cat => activities[cat.key] = null);
+            const today = getTodayKey(), last = state.lastDate;
+            if (last && last !== today) {
+                const yday = state.days[last];
+                if (yday) state.baseTotalScore += yday.score;
+                categories.forEach(c => activities[c.key] = null);
                 todayScore = -2;
-                
-                state.days[todayKey] = {
-                    date: todayKey,
-                    activities: {...activities},
-                    score: todayScore
-                };
-                state.lastDate = todayKey;
-                
+                state.days[today] = { date: today, activities: {...activities}, score: todayScore };
+                state.lastDate = today;
                 saveToStorage();
             } else {
-                const todayData = state.days[todayKey];
-                if (todayData) {
-                    activities = {...todayData.activities};
-                    todayScore = todayData.score;
-                } else {
-                    categories.forEach(cat => activities[cat.key] = null);
+                const td = state.days[today];
+                if (td) { activities = {...td.activities}; todayScore = td.score; }
+                else {
+                    categories.forEach(c => activities[c.key] = null);
                     todayScore = -2;
-                    
-                    state.days[todayKey] = {
-                        date: todayKey,
-                        activities: {...activities},
-                        score: todayScore
-                    };
-                    state.lastDate = todayKey;
-                    
+                    state.days[today] = { date: today, activities: {...activities}, score: todayScore };
+                    state.lastDate = today;
                     saveToStorage();
                 }
             }
-
             totalScore = state.baseTotalScore + todayScore;
             updateUI();
         }
 
         function calculateScore() {
-            let score = -2;
-            categories.forEach(cat => {
-                const value = activities[cat.key];
-                if (value === true) {
-                    if (cat.key === 'noDrink' || cat.key === 'noDrugs') {
-                        score += cat.pointsYes;
-                    } else {
-                        score += cat.points;
-                    }
-                } else if (value === false) {
-                    if (cat.key === 'noDrink' || cat.key === 'noDrugs') {
-                        score += cat.pointsNo;
-                    }
-                }
+            let s = -2;
+            categories.forEach(c => {
+                const v = activities[c.key];
+                if (v === true) s += (c.key === 'noDrink' || c.key === 'noDrugs') ? c.pointsYes : c.points;
+                else if (v === false && (c.key === 'noDrink' || c.key === 'noDrugs')) s += c.pointsNo;
             });
-            return score;
+            return s;
         }
 
-        function handleClick(key, value) {
-            activities[key] = value;
+        function handleClick(key, val) {
+            activities[key] = val;
             todayScore = calculateScore();
             totalScore = state.baseTotalScore + todayScore;
-            
-            const todayKey = getTodayKey();
-            state.days[todayKey] = {
-                date: todayKey,
-                activities: {...activities},
-                score: todayScore
-            };
-            
+            const today = getTodayKey();
+            state.days[today] = { date: today, activities: {...activities}, score: todayScore };
             saveToStorage();
             updateUI();
         }
@@ -604,33 +203,25 @@
         function updateUI() {
             document.getElementById('todayScore').textContent = (todayScore > 0 ? '+' : '') + todayScore;
             document.getElementById('totalScore').textContent = totalScore;
-            
             updateDateTime();
             
-            const todayCard = document.getElementById('todayCard');
-            todayCard.classList.remove('negative', 'neutral', 'positive');
-            if (todayScore < 0) todayCard.classList.add('negative');
-            else if (todayScore === 0) todayCard.classList.add('neutral');
-            else todayCard.classList.add('positive');
+            const tc = document.getElementById('todayCard');
+            tc.classList.remove('negative', 'neutral', 'positive');
+            if (todayScore < 0) tc.classList.add('negative');
+            else if (todayScore === 0) tc.classList.add('neutral');
+            else tc.classList.add('positive');
             
-            let motivation = '';
-            if (todayScore >= 3) motivation = '🔥 Perfecte dag! Je bent on fire!';
-            else if (todayScore >= 1) motivation = '✨ Goede dag! Je maakt vooruitgang!';
-            else if (todayScore === 0) motivation = '💪 Neutrale dag. Morgen kun je het beter doen!';
-            else if (todayScore >= -2) motivation = '🤔 Lastige dag. Morgen is een nieuwe kans!';
-            else motivation = '💙 Iedereen heeft mindere dagen. Blijf doorgaan!';
-            document.getElementById('todayMotivation').textContent = motivation;
+            let mot = '';
+            if (todayScore >= 3) mot = '🔥 Perfecte dag! Je bent on fire!';
+            else if (todayScore >= 1) mot = '✨ Goede dag! Je maakt vooruitgang!';
+            else if (todayScore === 0) mot = '💪 Neutrale dag. Morgen kun je het beter doen!';
+            else if (todayScore >= -2) mot = '🤔 Lastige dag. Morgen is een nieuwe kans!';
+            else mot = '💙 Iedereen heeft mindere dagen. Blijf doorgaan!';
+            document.getElementById('todayMotivation').textContent = mot;
             
-            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
-            const dailyMotiv = motivations[dayOfYear % motivations.length];
-            document.getElementById('motivationBox').innerHTML = `
-                <h3>${dailyMotiv.title}</h3>
-                <p>${dailyMotiv.text}</p>
-                <div class="tip-box">
-                    <p><strong>💡 Tip van de dag:</strong></p>
-                    <p>${dailyMotiv.tip}</p>
-                </div>
-            `;
+            const doy = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+            const dm = motivations[doy % motivations.length];
+            document.getElementById('motivationBox').innerHTML = `<h3>${dm.title}</h3><p>${dm.text}</p><div class="tip-box"><p><strong>💡 Tip van de dag:</strong></p><p>${dm.tip}</p></div>`;
             
             updateMilestones();
             updateActivitiesList();
@@ -638,168 +229,90 @@
         }
 
         function updateMilestones() {
-            const streaks = calculateStreaks();
-            const milestones = [];
-            
-            if (streaks.goodSleep >= 7) {
-                milestones.push({ icon: '🏆', text: `${streaks.goodSleep} dagen goede slaap op rij! Je lichaam bedankt je.` });
-            }
-            if (streaks.sport >= 7) {
-                milestones.push({ icon: '💪', text: `${streaks.sport} dagen sporten! Je bouwt serieuze momentum op.` });
-            }
-            if (streaks.healthyEating >= 7) {
-                milestones.push({ icon: '🥗', text: `${streaks.healthyEating} dagen gezond eten! Je lichaam straalt het uit.` });
-            }
-            if (streaks.meditation >= 7) {
-                milestones.push({ icon: '🧘', text: `${streaks.meditation} dagen meditatie! Je mindset wordt steeds sterker.` });
-            }
-            if (streaks.personalDevelopment >= 7) {
-                milestones.push({ icon: '📚', text: `${streaks.personalDevelopment} dagen persoonlijke ontwikkeling! Kennis is macht.` });
-            }
-            if (totalScore >= 50) {
-                milestones.push({ icon: '⭐', text: `Totaalscore van ${totalScore}! Je bent op de goede weg.` });
-            }
-            
-            const container = document.getElementById('milestones');
-            if (milestones.length > 0) {
-                container.innerHTML = milestones.map(m => `
-                    <div class="milestone">
-                        <div class="milestone-icon">${m.icon}</div>
-                        <div>${m.text}</div>
-                    </div>
-                `).join('');
-            } else {
-                container.innerHTML = '';
-            }
+            const str = calculateStreaks(), m = [];
+            if (str.goodSleep >= 7) m.push({ icon: '🏆', text: `${str.goodSleep} dagen goede slaap op rij! Je lichaam bedankt je.` });
+            if (str.sport >= 7) m.push({ icon: '💪', text: `${str.sport} dagen sporten! Je bouwt serieuze momentum op.` });
+            if (str.healthyEating >= 7) m.push({ icon: '🥗', text: `${str.healthyEating} dagen gezond eten! Je lichaam straalt het uit.` });
+            if (str.meditation >= 7) m.push({ icon: '🧘', text: `${str.meditation} dagen meditatie! Je mindset wordt steeds sterker.` });
+            if (str.personalDevelopment >= 7) m.push({ icon: '📚', text: `${str.personalDevelopment} dagen persoonlijke ontwikkeling! Kennis is macht.` });
+            if (totalScore >= 50) m.push({ icon: '⭐', text: `Totaalscore van ${totalScore}! Je bent op de goede weg.` });
+            document.getElementById('milestones').innerHTML = m.length > 0 ? m.map(x => `<div class="milestone"><div class="milestone-icon">${x.icon}</div><div>${x.text}</div></div>`).join('') : '';
         }
 
         function calculateStreaks() {
-            const streaks = {};
-            const positiveCategories = ['goodSleep', 'sport', 'healthyEating', 'meditation', 'personalDevelopment'];
-            
-            positiveCategories.forEach(catKey => {
-                let streak = 0;
-                const today = new Date();
-                
+            const str = {}, pos = ['goodSleep', 'sport', 'healthyEating', 'meditation', 'personalDevelopment'];
+            pos.forEach(k => {
+                let s = 0;
                 for (let i = 0; i < 30; i++) {
-                    const checkDate = new Date(today);
-                    checkDate.setDate(checkDate.getDate() - i);
-                    const dateKey = `${checkDate.getFullYear()}-${String(checkDate.getMonth() + 1).padStart(2, '0')}-${String(checkDate.getDate()).padStart(2, '0')}`;
-                    
-                    const dayData = state.days[dateKey];
-                    if (dayData && dayData.activities[catKey] === true) {
-                        streak++;
-                    } else {
-                        break;
-                    }
+                    const d = new Date(); d.setDate(d.getDate() - i);
+                    const dk = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                    const dd = state.days[dk];
+                    if (dd && dd.activities[k] === true) s++; else break;
                 }
-                
-                streaks[catKey] = streak;
+                str[k] = s;
             });
-            
-            return streaks;
+            return str;
         }
 
         function updateActivitiesList() {
-            const container = document.getElementById('activitiesList');
-            container.innerHTML = categories.map(cat => {
-                const value = activities[cat.key];
-                let displayPoints = '';
-                let pointsClass = 'points-neutral';
-                
-                if (cat.key === 'noDrink' || cat.key === 'noDrugs') {
-                    displayPoints = value === true ? '0' : value === false ? '-2' : '0';
-                    pointsClass = value === false ? 'points-negative' : 'points-neutral';
+            document.getElementById('activitiesList').innerHTML = categories.map(c => {
+                const v = activities[c.key];
+                let dp = '', pc = 'points-neutral';
+                if (c.key === 'noDrink' || c.key === 'noDrugs') {
+                    dp = v === true ? '0' : v === false ? '-2' : '0';
+                    pc = v === false ? 'points-negative' : 'points-neutral';
                 } else {
-                    displayPoints = value === true ? '+1' : '0';
-                    pointsClass = value === true ? 'points-positive' : 'points-neutral';
+                    dp = v === true ? '+1' : '0';
+                    pc = v === true ? 'points-positive' : 'points-neutral';
                 }
-                
-                return `
-                    <div class="activity">
-                        <div class="activity-header">
-                            <div class="activity-name">${cat.label}</div>
-                            <div class="activity-points ${pointsClass}">${displayPoints}</div>
-                        </div>
-                        <div class="activity-buttons">
-                            <button class="btn btn-yes ${value === true ? 'active' : ''}" 
-                                    onclick="handleClick('${cat.key}', true)">JA</button>
-                            <button class="btn btn-no ${value === false ? 'active' : ''}" 
-                                    onclick="handleClick('${cat.key}', false)">NEE</button>
-                            <button class="btn btn-reset" 
-                                    onclick="handleClick('${cat.key}', null)">⟲</button>
-                        </div>
-                    </div>
-                `;
+                return `<div class="activity"><div class="activity-header"><div class="activity-name">${c.label}</div><div class="activity-points ${pc}">${dp}</div></div><div class="activity-buttons"><button class="btn btn-yes ${v === true ? 'active' : ''}" onclick="handleClick('${c.key}', true)">JA</button><button class="btn btn-no ${v === false ? 'active' : ''}" onclick="handleClick('${c.key}', false)">NEE</button><button class="btn btn-reset" onclick="handleClick('${c.key}', null)">⟲</button></div></div>`;
             }).join('');
         }
 
         function updateChart() {
-            const history = [];
-            const sortedDates = Object.keys(state.days).sort();
-            
-            let runningTotal = 0;
-            sortedDates.forEach(date => {
-                if (date !== getTodayKey()) {
-                    runningTotal += state.days[date].score;
-                }
-                const total = date === getTodayKey() ? 
-                    state.baseTotalScore + state.days[date].score : 
-                    runningTotal;
-                history.push({ date, total });
+            const hist = [], sd = Object.keys(state.days).sort();
+            let rt = 0;
+            sd.forEach(d => {
+                if (d !== getTodayKey()) rt += state.days[d].score;
+                const t = d === getTodayKey() ? state.baseTotalScore + state.days[d].score : rt;
+                hist.push({ date: d, total: t });
             });
             
             const ctx = document.getElementById('progressChart');
-            
-            if (chart) {
-                chart.destroy();
-            }
-            
-            if (history.length > 0) {
+            if (chart) chart.destroy();
+            if (hist.length > 0) {
                 chart = new Chart(ctx.getContext('2d'), {
                     type: 'line',
                     data: {
-                        labels: history.slice(-30).map(h => {
-                            const parts = h.date.split('-');
-                            return `${parts[2]}/${parts[1]}`;
-                        }),
-                        datasets: [{
-                            label: 'Totale Score',
-                            data: history.slice(-30).map(h => h.total),
-                            borderColor: '#8b5cf6',
-                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
-                            tension: 0.4,
-                            fill: true,
-                            pointRadius: 5,
-                            pointHoverRadius: 7
-                        }]
+                        labels: hist.slice(-30).map(h => { const p = h.date.split('-'); return `${p[2]}/${p[1]}`; }),
+                        datasets: [{ label: 'Totale Score', data: hist.slice(-30).map(h => h.total), borderColor: '#8b5cf6', backgroundColor: 'rgba(139, 92, 246, 0.1)', tension: 0.4, fill: true, pointRadius: 5, pointHoverRadius: 7 }]
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                ticks: {
-                                    callback: function(value) {
-                                        return Math.round(value);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { display: false } }, scales: { y: { ticks: { callback: v => Math.round(v) } } } }
                 });
             }
         }
 
         function resetAll() {
             if (confirm('Weet je zeker dat je alle data wilt resetten?')) {
-                try {
-                    localStorage.removeItem(STORAGE_KEY);
-                } catch (e) {}
-                
-                
+                try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+                state = { days: {}, baseTotalScore: 0, lastDate: getTodayKey() };
+                categories.forEach(c => activities[c.key] = null);
+                todayScore = -2; totalScore = -2;
+                state.days[getTodayKey()] = { date: getTodayKey(), activities: {...activities}, score: todayScore };
+                saveToStorage(); updateUI(); alert('🔄 Data is gereset!');
+            }
+        }
+
+        function updateDateTime() {
+            const n = new Date();
+            const dag = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
+            const mnd = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+            const el = document.getElementById('dateTime');
+            if (el) el.textContent = `${dag[n.getDay()]} ${n.getDate()} ${mnd[n.getMonth()]} ${n.getFullYear()} • ${String(n.getHours()).padStart(2,'0')}:${String(n.getMinutes()).padStart(2,'0')}`;
+        }
+
+        initializeApp();
+        setInterval(updateDateTime, 1000);
+    </script>
+</body>
+</html>
