@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -15,7 +14,15 @@
         .container { max-width: 800px; margin: 0 auto; }
         .header { text-align: center; color: white; margin-bottom: 30px; }
         .header h1 { font-size: 2.5rem; margin-bottom: 10px; }
-        .save-status { background: rgba(16, 185, 129, 0.3); color: white; padding: 10px 20px; border-radius: 10px; margin: 10px auto; max-width: 400px; text-align: center; font-size: 0.9rem; }
+        .date-navigator { background: white; border-radius: 20px; padding: 20px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+        .date-nav-btn { background: #8b5cf6; color: white; border: none; border-radius: 12px; padding: 15px 25px; font-size: 1.5rem; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+        .date-nav-btn:hover { background: #7c3aed; transform: scale(1.05); }
+        .date-nav-btn:active { transform: scale(0.95); }
+        .date-nav-btn:disabled { background: #d1d5db; cursor: not-allowed; transform: scale(1); }
+        .current-date { flex: 1; text-align: center; }
+        .current-date h2 { font-size: 1.5rem; color: #374151; margin-bottom: 5px; }
+        .current-date p { font-size: 0.9rem; color: #6b7280; }
+        .viewing-past { background: #fef3c7; border: 2px solid #f59e0b; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: center; color: #92400e; font-weight: 600; }
         .scores { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
         .score-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.3s; }
         .score-card.today.negative { background: #ef4444; color: white; }
@@ -53,15 +60,14 @@
         .btn-reset:hover { background: #d1d5db; }
         .chart-container { background: white; border-radius: 20px; padding: 30px; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .chart-container h2 { font-size: 1.8rem; margin-bottom: 20px; color: #374151; }
-        .action-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px; }
-        .action-btn { padding: 15px 30px; background: white; color: #8b5cf6; border: 2px solid #8b5cf6; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; }
-        .action-btn:hover { background: #8b5cf6; color: white; }
         .reset-btn { display: block; margin: 0 auto; padding: 15px 40px; background: #ef4444; color: white; border: none; border-radius: 15px; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 5px 15px rgba(239, 68, 68, 0.3); }
         .reset-btn:hover { background: #dc2626; }
         @media (max-width: 768px) {
             .scores { grid-template-columns: 1fr; }
             .header h1 { font-size: 2rem; }
             .score-value { font-size: 2.5rem; }
+            .date-nav-btn { padding: 12px 20px; font-size: 1.2rem; }
+            .current-date h2 { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -72,14 +78,23 @@
             <p>Bouw aan een beter leven, één dag tegelijk</p>
             <p id="dateTime" style="margin-top: 10px; font-size: 1.1rem; opacity: 0.9;"></p>
         </div>
-        <div class="save-status">✅ Je data wordt automatisch opgeslagen!</div>
-        <div class="action-buttons">
-            <button class="action-btn" onclick="exportData()">💾 Exporteer Backup</button>
-            <button class="action-btn" onclick="importData()">📂 Importeer Backup</button>
+        
+        <div class="date-navigator">
+            <button class="date-nav-btn" onclick="navigateDay(-1)">◀</button>
+            <div class="current-date">
+                <h2 id="viewingDateDisplay">Vandaag</h2>
+                <p id="viewingDateSub"></p>
+            </div>
+            <button class="date-nav-btn" id="nextDayBtn" onclick="navigateDay(1)">▶</button>
         </div>
+        
+        <div id="viewingPastAlert" class="viewing-past" style="display: none;">
+            ⚠️ Je bekijkt een dag uit het verleden. Wijzigingen worden opgeslagen.
+        </div>
+        
         <div class="scores">
             <div class="score-card today" id="todayCard">
-                <div class="score-label">📅 Vandaag</div>
+                <div class="score-label" id="dayLabel">📅 Vandaag</div>
                 <div class="score-value" id="todayScore">-2</div>
                 <div class="score-label">Start: -2</div>
                 <div class="score-motivation" id="todayMotivation"></div>
@@ -114,6 +129,8 @@
         ];
         let state = { days: {}, baseTotalScore: 0, lastDate: null };
         let activities = {}, todayScore = -2, totalScore = 0, chart = null;
+        let viewingDate = null; // null betekent vandaag
+        
         const motivations = [
             { title: "💪 Focus op Beweging", text: "Regelmatig sporten verbetert niet alleen je fysieke gezondheid, maar ook je mentale welzijn. Probeer elke dag minstens 30 minuten te bewegen.", tip: "Start klein: 10 push-ups elke ochtend kan al een grote impact hebben!" },
             { title: "🥗 Voeding is de Basis", text: "Je lichaam is een tempel en voeding is de bouwsteen. Eet kleurrijk: hoe meer verschillende kleuren groenten en fruit op je bord, hoe beter.", tip: "Bereid je maaltijden voor op zondag, zo voorkom je ongezonde keuzes tijdens de week." },
@@ -125,30 +142,70 @@
         ];
 
         function getTodayKey() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
+        function getDateKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; }
+        function parseDateKey(key) { const [y,m,d] = key.split('-').map(Number); return new Date(y, m-1, d); }
         function saveToStorage() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); return true; } catch(e) { return false; } }
         function loadFromStorage() { try { const d = localStorage.getItem(STORAGE_KEY); return d ? JSON.parse(d) : null; } catch(e) { return null; } }
         
-        function exportData() {
-            const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = `lifestyle-backup-${getTodayKey()}.json`;
-            document.body.appendChild(a); a.click(); document.body.removeChild(a);
-            URL.revokeObjectURL(url); alert('💾 Backup gedownload!');
+        function navigateDay(offset) {
+            const currentDate = viewingDate ? parseDateKey(viewingDate) : new Date();
+            currentDate.setDate(currentDate.getDate() + offset);
+            
+            const newDateKey = getDateKey(currentDate);
+            const today = getTodayKey();
+            
+            // Niet in de toekomst kijken
+            if (newDateKey > today) return;
+            
+            viewingDate = newDateKey;
+            loadDayData(viewingDate);
+            updateUI();
+            updateNavigationUI();
         }
         
-        function importData() {
-            const input = document.createElement('input');
-            input.type = 'file'; input.accept = '.json';
-            input.onchange = e => {
-                const reader = new FileReader();
-                reader.onload = ev => {
-                    try { state = JSON.parse(ev.target.result); saveToStorage(); initializeApp(); alert('📂 Data geïmporteerd!'); }
-                    catch(err) { alert('❌ Fout bij importeren'); }
-                };
-                reader.readAsText(e.target.files[0]);
-            };
-            input.click();
+        function updateNavigationUI() {
+            const today = getTodayKey();
+            const isToday = !viewingDate || viewingDate === today;
+            
+            // Disable next button als we vandaag bekijken
+            document.getElementById('nextDayBtn').disabled = isToday;
+            
+            // Update datum display
+            if (isToday) {
+                document.getElementById('viewingDateDisplay').textContent = 'Vandaag';
+                document.getElementById('viewingDateSub').textContent = formatDateNice(new Date());
+                document.getElementById('viewingPastAlert').style.display = 'none';
+                document.getElementById('dayLabel').textContent = '📅 Vandaag';
+            } else {
+                const date = parseDateKey(viewingDate);
+                const daysAgo = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24));
+                
+                if (daysAgo === 1) {
+                    document.getElementById('viewingDateDisplay').textContent = 'Gisteren';
+                } else {
+                    document.getElementById('viewingDateDisplay').textContent = formatDateNice(date);
+                }
+                document.getElementById('viewingDateSub').textContent = `${daysAgo} ${daysAgo === 1 ? 'dag' : 'dagen'} geleden`;
+                document.getElementById('viewingPastAlert').style.display = 'block';
+                document.getElementById('dayLabel').textContent = '📅 Deze Dag';
+            }
+        }
+        
+        function formatDateNice(date) {
+            const dagen = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
+            const maanden = ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+            return `${dagen[date.getDay()]} ${date.getDate()} ${maanden[date.getMonth()]}`;
+        }
+        
+        function loadDayData(dateKey) {
+            const dayData = state.days[dateKey];
+            if (dayData) {
+                activities = {...dayData.activities};
+                todayScore = dayData.score;
+            } else {
+                categories.forEach(c => activities[c.key] = null);
+                todayScore = -2;
+            }
         }
 
         function initializeApp() {
@@ -157,26 +214,33 @@
             else state = { days: {}, baseTotalScore: 0, lastDate: null };
 
             const today = getTodayKey(), last = state.lastDate;
+            
+            // Update base score bij nieuwe dag
             if (last && last !== today) {
                 const yday = state.days[last];
                 if (yday) state.baseTotalScore += yday.score;
+                state.lastDate = today;
+                saveToStorage();
+            }
+            
+            // Laad vandaag
+            viewingDate = null;
+            const td = state.days[today];
+            if (td) { 
+                activities = {...td.activities}; 
+                todayScore = td.score; 
+            } else {
                 categories.forEach(c => activities[c.key] = null);
                 todayScore = -2;
                 state.days[today] = { date: today, activities: {...activities}, score: todayScore };
                 state.lastDate = today;
                 saveToStorage();
-            } else {
-                const td = state.days[today];
-                if (td) { activities = {...td.activities}; todayScore = td.score; }
-                else {
-                    categories.forEach(c => activities[c.key] = null);
-                    todayScore = -2;
-                    state.days[today] = { date: today, activities: {...activities}, score: todayScore };
-                    state.lastDate = today;
-                    saveToStorage();
-                }
             }
+            
+            // Bereken totaalscore (alle dagen tot gisteren + vandaag)
             totalScore = state.baseTotalScore + todayScore;
+            
+            updateNavigationUI();
             updateUI();
         }
 
@@ -193,9 +257,28 @@
         function handleClick(key, val) {
             activities[key] = val;
             todayScore = calculateScore();
-            totalScore = state.baseTotalScore + todayScore;
-            const today = getTodayKey();
-            state.days[today] = { date: today, activities: {...activities}, score: todayScore };
+            
+            const dateToUpdate = viewingDate || getTodayKey();
+            state.days[dateToUpdate] = { date: dateToUpdate, activities: {...activities}, score: todayScore };
+            
+            // Herbereken totaalscore
+            if (!viewingDate || viewingDate === getTodayKey()) {
+                totalScore = state.baseTotalScore + todayScore;
+            } else {
+                // Als we een oude dag bewerken, herbereken vanaf scratch
+                const sortedDates = Object.keys(state.days).sort();
+                let runningTotal = 0;
+                const today = getTodayKey();
+                sortedDates.forEach(d => {
+                    if (d < today) {
+                        runningTotal += state.days[d].score;
+                    }
+                });
+                state.baseTotalScore = runningTotal;
+                const todayData = state.days[today];
+                totalScore = state.baseTotalScore + (todayData ? todayData.score : -2);
+            }
+            
             saveToStorage();
             updateUI();
         }
@@ -245,7 +328,7 @@
                 let s = 0;
                 for (let i = 0; i < 30; i++) {
                     const d = new Date(); d.setDate(d.getDate() - i);
-                    const dk = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+                    const dk = getDateKey(d);
                     const dd = state.days[dk];
                     if (dd && dd.activities[k] === true) s++; else break;
                 }
@@ -298,8 +381,12 @@
                 state = { days: {}, baseTotalScore: 0, lastDate: getTodayKey() };
                 categories.forEach(c => activities[c.key] = null);
                 todayScore = -2; totalScore = -2;
+                viewingDate = null;
                 state.days[getTodayKey()] = { date: getTodayKey(), activities: {...activities}, score: todayScore };
-                saveToStorage(); updateUI(); alert('🔄 Data is gereset!');
+                saveToStorage(); 
+                updateNavigationUI();
+                updateUI(); 
+                alert('🔄 Data is gereset!');
             }
         }
 
