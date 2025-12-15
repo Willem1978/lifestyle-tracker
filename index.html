@@ -96,7 +96,6 @@
             <div class="score-card today" id="todayCard">
                 <div class="score-label" id="dayLabel">📅 Vandaag</div>
                 <div class="score-value" id="todayScore">-2</div>
-                <div class="score-label">Start: -2</div>
                 <div class="score-motivation" id="todayMotivation"></div>
             </div>
             <div class="score-card total">
@@ -124,8 +123,8 @@
             { key: 'healthyEating', label: 'Gezond Eten', points: 1 },
             { key: 'meditation', label: 'Meditatie', points: 1 },
             { key: 'personalDevelopment', label: 'Persoonlijke Ontwikkeling', points: 1 },
-            { key: 'noDrink', label: 'Geen Drank', pointsYes: 0, pointsNo: -2 },
-            { key: 'noDrugs', label: 'Geen Drugs', pointsYes: 0, pointsNo: -2 }
+            { key: 'noDrink', label: 'Geen Alcohol', pointsYes: 0, pointsNo: -2 },
+            { key: 'noDrugs', label: 'Geen Ander Slecht Gedrag', pointsYes: 0, pointsNo: -2 }
         ];
         let state = { days: {}, baseTotalScore: 0, lastDate: null };
         let activities = {}, todayScore = -2, totalScore = 0, chart = null;
